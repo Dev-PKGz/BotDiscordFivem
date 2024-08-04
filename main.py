@@ -47,4 +47,8 @@ async def send_connect_button(ctx):
 async def clear(ctx):
     await cmd.clear(ctx)
 
+@bot.command(name='anuncio')
+async def announce(ctx):
+    await cmd.announce(ctx)
+
 bot.run(TOKEN)

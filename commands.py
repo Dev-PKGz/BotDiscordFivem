@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 import asyncio
-from config import GUILD_ID, ROLE_ID, PREDEFINED_CHANNEL_ID, WELCOME_MESSAGE, FIVEM_CONNECT
+from config import GUILD_ID, ROLE_ID, PREDEFINED_CHANNEL_ID, ANNOUNCE_CHANNEL_ID, WELCOME_MESSAGE, FIVEM_CONNECT
 
 # Variável global para armazenar a mensagem de boas-vindas configurada
 welcome_message = WELCOME_MESSAGE
@@ -206,3 +206,43 @@ async def clear(ctx):
             break
 
     await ctx.send(f"Todas as mensagens foram apagadas. Total de mensagens apagadas: {deleted}", delete_after=5)
+
+async def announce(ctx):
+    def check(m):
+        return m.author == ctx.author and m.channel == ctx.channel
+
+    await ctx.send("Por favor, forneça o título do anúncio:")
+
+    try:
+        msg = await ctx.bot.wait_for('message', check=check, timeout=60)
+        announce_title = msg.content
+    except asyncio.TimeoutError:
+        await ctx.send("Tempo esgotado. Por favor, tente novamente.")
+        return
+
+    await ctx.send("Por favor, forneça o conteúdo do anúncio:")
+
+    try:
+        msg = await ctx.bot.wait_for('message', check=check, timeout=60)
+        announce_content = msg.content
+    except asyncio.TimeoutError:
+        await ctx.send("Tempo esgotado. Por favor, tente novamente.")
+        return
+
+    channel = ctx.bot.get_channel(ANNOUNCE_CHANNEL_ID)
+    if channel is None:
+        await ctx.send("Canal de anúncio não encontrado!")
+        return
+    
+    embed = discord.Embed(
+        title=announce_title,
+        description=announce_content,
+        color=discord.Color.red()
+    )
+    
+    try:
+        await channel.send(embed=embed)
+        await ctx.send(f"Anúncio enviado para {channel.mention}")
+    except Exception as e:
+        await ctx.send(f"Erro ao enviar anúncio: {e}")
+        print(f"Erro ao enviar anúncio para o canal {ANNOUNCE_CHANNEL_ID}: {e}")
