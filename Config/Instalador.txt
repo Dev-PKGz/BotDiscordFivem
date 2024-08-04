@@ -1,0 +1,2 @@
+Instalar o Python e Colocar Add Python to PATH
+Instalar Biblioteca Discord.py > pip install discord.py
